@@ -1,45 +1,49 @@
-from pathlib import Path
+from decimal import Decimal
 
-"""
-    Функція для зчитування інформації про котів з файлу та повернення списку словників.
+
+def generator_numbers(text: str):
+    """
+    Генерує числа з тексту як генератор, використовуючи модуль decimal.
 
     Args:
-        path (str): Шлях до файлу з даними про котів.
+        text (str): Рядок, який містить числа, розділені пробілами.
+
+    Yields:
+        Decimal: Дійсне число з тексту.
+    """
+    words = text.split()
+    print(f"words: {words}")
+    for word in words:
+        try:
+            number = Decimal(word)  # Використовуємо Decimal для точного обчислення
+            yield number
+        except ValueError:
+            pass
+
+
+def sum_profit(text: str, func):
+    """
+    Обчислює загальний прибуток з чисел у тексті, використовуючи модуль decimal.
+
+    Args:
+        text (str): Рядок, який містить числа, розділені пробілами.
+        func (Callable): Функція-генератор для отримання чисел.
 
     Returns:
-        list: Список словників з інформацією про котів. Кожен словник містить поля 'id', 'name' та 'age'.
-              Якщо файл не знайдено або відбулася помилка, повертається порожній список.
+        Decimal: Загальний прибуток.
     """
+    total_profit = Decimal(0)
+    for number in func(text):
+        total_profit += number
+    return total_profit
 
 
-def get_cats_info(path):
-    cat_list = []
-    cat_dict = {}
-    try:
-        with open(path, "r", encoding="utf-8") as file:
-            cat_data = file.readlines()
-            if len(cat_data) == 0:
-                return cat_list
-            for i in range(len(cat_data)):
-                cat_id, cat_name, cat_age = cat_data[i].split(",")
-                cat_dict = {"id": cat_id, "name": cat_name, "age": int(cat_age)}
-                cat_list.append(cat_dict)
-            return cat_list
-
-    except FileNotFoundError:
-        print(f"File '{path}' not found.")
-        return cat_list
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return cat_list
-
-
+# Приклад використання:
 def main():
-    path = input("Enter file path: ")
-    if not path:
-        path = "./py/cats.txt"
-
-    print(get_cats_info(path))
+    text = """Загальний дохід працівника складається з декількох частин: 1000.01 як основний дохід, доповнений додатковими надходженнями 27.45 і 324.00 доларів."""
+    print(f"text: {text}")
+    total_income = sum_profit(text, generator_numbers)
+    print(f"Загальний дохід: {total_income}")
 
 
 if __name__ == "__main__":
